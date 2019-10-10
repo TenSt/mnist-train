@@ -18,7 +18,7 @@ jobs:
         docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
         docker build . --no-cache -t ${DOCKER_URL}
         docker push ${DOCKER_URL}
-        sed -n "s/IMG/${DOCKER_URL}/g" mnist_train_pipeline.py
+        sed "s/IMG/${DOCKER_URL}/g" mnist_train_pipeline.py
         cat mnist_train_pipeline.py | grep image
 
   pipeline:
