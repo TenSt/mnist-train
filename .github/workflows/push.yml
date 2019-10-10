@@ -46,16 +46,16 @@ jobs:
     - name: Check
       run: |
         ls -lsa
-    # - name: Get kfplctl
-    #   run: |
-    #     wget https://github.com/TenSt/kubeflow-pipelines-kfplctl/releases/download/v0.0.1/kfplctl
-    #     chmod +x ./kfplctl
-    # - name: kfplctl
-    #   run: |
-    #     export KUBEFLOW_PIPELINE_API=${{ secrets.KUBEFLOW_PIPELINE_API }}
-    #     ./kfplctl get pipelines
-    #     plid="$(./kfplctl upload mnist-pipeline --pipeline mnist_train_pipeline.py.tar.gz)"
-    #     echo ${plid}
+    - name: Get kfplctl
+      run: |
+        wget https://github.com/TenSt/kubeflow-pipelines-kfplctl/releases/download/v0.0.1/kfplctl
+        chmod +x ./kfplctl
+    - name: kfplctl
+      run: |
+        export KUBEFLOW_PIPELINE_API=${{ secrets.KUBEFLOW_PIPELINE_API }}
+        ./kfplctl get pipelines
+        plid="$(./kfplctl upload mnist-train-pipeline --pipeline mnist_train_pipeline.py.tar.gz)"
+        echo ${plid}
     #     eid="$(./kfplctl create experiment mnist)"
     #     echo ${eid}
     #     rid="$(./kfplctl create run mnist --parameters mnistParams.json --pipeline-id ${plid} --experiment-id ${eid})"
