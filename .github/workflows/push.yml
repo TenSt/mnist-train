@@ -38,7 +38,7 @@ jobs:
         APP=${GITHUB_REPOSITORY#*/}
         DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
         sed -n "s,IMG,${DOCKER_URL},g" base_mnist_train_pipeline.py > ./mnist_train_pipeline.py
-        cat ./mnist_train_pipeline.py | grep image
+        cat ./mnist_train_pipeline.py
     - name: Compile
       run: |
         pip3 install -r requirements.txt --upgrade
