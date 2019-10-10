@@ -6,21 +6,24 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+        SHA: "${GITHUB_SHA:0:7}"
+        APP: "${GITHUB_REPOSITORY#*/}"
+        DOCKER_URL: "${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}"
 
     steps:
     - name: Checkout code
       uses: actions/checkout@master
     - name: Docker Build and Push
-      env:
-        SHA: "${GITHUB_SHA:0:7}"
-        APP: "${GITHUB_REPOSITORY#*/}"
-        DOCKER_URL: "${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}"
       run: |
-        docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
-        docker build . --no-cache -t ${DOCKER_URL}
-        docker push ${DOCKER_URL}
-        sed 's/IMG/${DOCKER_URL}/g' mnist_train_pipeline.py
-        cat mnist_train_pipeline.py | grep image
+        echo ${SHA}
+        echo ${APP}
+        echo ${DOCKER_URL}
+        # docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+        # docker build . --no-cache -t ${DOCKER_URL}
+        # docker push ${DOCKER_URL}
+        # sed 's/IMG/${DOCKER_URL}/g' mnist_train_pipeline.py
+        # cat mnist_train_pipeline.py | grep image
 
   pipeline:
 
