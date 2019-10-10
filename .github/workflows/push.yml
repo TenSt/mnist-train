@@ -17,9 +17,7 @@ jobs:
         DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
         docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
         docker build . --no-cache -t ${DOCKER_URL}
-        docker push ${DOCKER_URL}
-        sed "s,IMG,${DOCKER_URL},g" mnist_train_pipeline.py
-        cat mnist_train_pipeline.py | grep image
+        # docker push ${DOCKER_URL}
 
   pipeline:
 
@@ -34,6 +32,12 @@ jobs:
       with:
         python-version: '3.x'
         architecture: 'x64'
+    - name: sed
+      run: |
+        SHA=${GITHUB_SHA:0:7}
+        APP=${GITHUB_REPOSITORY#*/}
+        DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
+        sed -n "s,IMG,${DOCKER_URL},g" mnist_train_pipeline.py
     - name: Compile
       run: |
         pip3 install -r requirements.txt --upgrade
@@ -41,6 +45,7 @@ jobs:
     - name: Check
       run: |
         ls -lsa
+        cat mnist_train_pipeline.py | grep image
     # - name: Get kfplctl
     #   run: |
     #     wget https://github.com/TenSt/kubeflow-pipelines-kfplctl/releases/download/v0.0.1/kfplctl
