@@ -38,6 +38,7 @@ jobs:
         APP=${GITHUB_REPOSITORY#*/}
         DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
         sed -n "s,IMG,${DOCKER_URL},g" base_mnist_train_pipeline.py > mnist_train_pipeline.py
+        cat mnist_train_pipeline.py | grep image
     - name: Compile
       run: |
         pip3 install -r requirements.txt --upgrade
@@ -45,7 +46,6 @@ jobs:
     - name: Check
       run: |
         ls -lsa
-        cat mnist_train_pipeline.py | grep image
     # - name: Get kfplctl
     #   run: |
     #     wget https://github.com/TenSt/kubeflow-pipelines-kfplctl/releases/download/v0.0.1/kfplctl
