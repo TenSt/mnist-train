@@ -25,26 +25,26 @@ jobs:
         # sed 's/IMG/${DOCKER_URL}/g' mnist_train_pipeline.py
         # cat mnist_train_pipeline.py | grep image
 
-  pipeline:
+  # pipeline:
 
-    needs: build
-    runs-on: ubuntu-latest
+  #   needs: build
+  #   runs-on: ubuntu-latest
     
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@master
-    - name: Setup python
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.x'
-        architecture: 'x64'
-    - name: Compile
-      run: |
-        pip3 install -r requirements.txt --upgrade
-        python3 mnist_train_pipeline.py
-    - name: Check
-      run: |
-        ls -lsa
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@master
+  #   - name: Setup python
+  #     uses: actions/setup-python@v1
+  #     with:
+  #       python-version: '3.x'
+  #       architecture: 'x64'
+  #   - name: Compile
+  #     run: |
+  #       pip3 install -r requirements.txt --upgrade
+  #       python3 mnist_train_pipeline.py
+  #   - name: Check
+  #     run: |
+  #       ls -lsa
     # - name: Get kfplctl
     #   run: |
     #     wget https://github.com/TenSt/kubeflow-pipelines-kfplctl/releases/download/v0.0.1/kfplctl
