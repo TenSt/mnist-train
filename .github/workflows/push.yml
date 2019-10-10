@@ -1,0 +1,59 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@master
+    - name: Docker Build and Push
+      env:
+        SHA="${GITHUB_SHA:0:7}"
+        APP="${GITHUB_REPOSITORY#*/}"
+        DOCKER_URL="${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}"
+      run: |
+        docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+        docker build . --no-cache -t ${DOCKER_URL}
+        docker push ${DOCKER_URL}
+        sed 's/IMG/${DOCKER_URL}/g' mnist_train_pipeline.py
+        cat mnist_train_pipeline.py | grep image
+
+  pipeline:
+
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@master
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+        architecture: 'x64'
+    - name: Compile
+      run: |
+        pip3 install -r requirements.txt --upgrade
+        python3 mnist_train_pipeline.py
+    - name: Check
+      run: |
+        ls -lsa
+    # - name: Get kfplctl
+    #   run: |
+    #     wget https://github.com/TenSt/kubeflow-pipelines-kfplctl/releases/download/v0.0.1/kfplctl
+    #     chmod +x ./kfplctl
+    # - name: kfplctl
+    #   run: |
+    #     export KUBEFLOW_PIPELINE_API=${{ secrets.KUBEFLOW_PIPELINE_API }}
+    #     ./kfplctl get pipelines
+    #     plid="$(./kfplctl upload mnist-pipeline --pipeline mnist_train_pipeline.py.tar.gz)"
+    #     echo ${plid}
+    #     eid="$(./kfplctl create experiment mnist)"
+    #     echo ${eid}
+    #     rid="$(./kfplctl create run mnist --parameters mnistParams.json --pipeline-id ${plid} --experiment-id ${eid})"
+    #     echo ${rid}
+    #     ./kfplctl get run $rid status
