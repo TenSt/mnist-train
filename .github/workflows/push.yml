@@ -3,25 +3,25 @@ name: CI
 on: [push]
 
 jobs:
-  # build:
+  build:
 
-  #   runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@master
-  #   - name: Docker Build and Push
-  #     run: |
-  #       SHA=${GITHUB_SHA:0:7}
-  #       APP=${GITHUB_REPOSITORY#*/}
-  #       DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
-  #       docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
-  #       docker build . --no-cache -t ${DOCKER_URL}
-  #       # docker push ${DOCKER_URL}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@master
+    - name: Docker Build and Push
+      run: |
+        SHA=${GITHUB_SHA:0:7}
+        APP=${GITHUB_REPOSITORY#*/}
+        DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
+        docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+        docker build . --no-cache -t ${DOCKER_URL}
+        docker push ${DOCKER_URL}
 
   pipeline:
 
-    # needs: build
+    needs: build
     runs-on: ubuntu-latest
     
     steps:
