@@ -53,12 +53,27 @@ jobs:
     - name: kfplctl
       run: |
         export KUBEFLOW_PIPELINE_API=${{ secrets.KUBEFLOW_PIPELINE_API }}
-        #./kfplctl get pipelines | grep mnist
-        cat mnist_train_pipeline.py | grep mnist
-        # plid="$(./kfplctl upload mnist-train-pipeline --pipeline mnist_train_pipeline.py.tar.gz)"
-        # echo ${plid}
-    #     eid="$(./kfplctl create experiment mnist)"
-    #     echo ${eid}
-    #     rid="$(./kfplctl create run mnist --parameters mnistParams.json --pipeline-id ${plid} --experiment-id ${eid})"
-    #     echo ${rid}
-    #     ./kfplctl get run $rid status
+        # pipeline
+        plid="$(./kfplctl get pipeline --name mnist-train-pipeline)"
+        if [ -z "$plid" ]
+        then
+          echo "Uploading new pipeline"
+          plid="$(./kfplctl upload mnist-train-pipeline --pipeline mnist_train_pipeline.py.tar.gz)"
+          echo $plid
+        else
+          echo $plid
+        fi
+        # experiment
+        eid="$(./kfplctl get experiment --name mnist-train-ci)"
+        if [ -z "$eid" ]
+        then
+          echo "Creating new experiment"
+          eid="$(./kfplctl create experiment mnist)"
+          echo $eid
+        else
+          echo $eid
+        fi
+        # run
+        rid="$(./kfplctl create run mnist --parameters mnistParams.json --pipeline-id ${plid} --experiment-id ${eid})"
+        echo ${rid}
+        ./kfplctl get run $rid status
