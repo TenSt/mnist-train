@@ -52,8 +52,8 @@ jobs:
         chmod +x ./kfplctl
     - name: kfplctl
       run: |
-        export KUBEFLOW_PIPELINE_API=${{ secrets.KUBEFLOW_PIPELINE_API }}
-        ./kfplctl get pipelines | grep mnist
+        KUBEFLOW_PIPELINE_API=${{ secrets.KUBEFLOW_PIPELINE_API }}
+        PIPE=$(./kfplctl get pipelines | grep mnist)
         # plid="$(./kfplctl upload mnist-train-pipeline --pipeline mnist_train_pipeline.py.tar.gz)"
         # echo ${plid}
     #     eid="$(./kfplctl create experiment mnist)"
