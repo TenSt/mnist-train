@@ -69,6 +69,6 @@ jobs:
           echo $eid
         fi
         # create new run
-        rid="$(./kfplctl create run mnist-${SHA} --parameters mnistParams.json --pipeline-id ${plid} --experiment-id ${eid})"
+        rid="$(./kfplctl create run mnist-train-ci-${SHA} --parameters mnistParams.json --pipeline-id ${plid} --experiment-id ${eid})"
         echo ${rid}
         ./kfplctl get run $rid status
