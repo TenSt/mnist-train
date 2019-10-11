@@ -1,0 +1,22 @@
+[
+	{
+		"name": "model-export-dir",
+		"value": "/mnt/export"
+	},
+	{
+		"name": "train-steps",
+		"value": "50"
+	},
+	{
+		"name": "learning-rate",
+		"value": "0.01"
+	},
+	{
+		"name": "batch-size",
+		"value": "100"
+	},
+	{
+		"name": "pvc-name",
+		"value": "local-storage"
+	}
+]
