@@ -53,17 +53,12 @@ jobs:
     - name: kfplctl
       run: |
         export KUBEFLOW_PIPELINE_API=${{ secrets.KUBEFLOW_PIPELINE_API }}
-        # pipeline
-        plid="$(./kfplctl get pipeline --name mnist-train-pipeline)"
-        if [ -z "$plid" ]
-        then
-          echo "Uploading new pipeline"
-          plid="$(./kfplctl upload mnist-train-pipeline --pipeline mnist_train_pipeline.py.tar.gz)"
-          echo $plid
-        else
-          echo $plid
-        fi
-        # experiment
+        SHA=${GITHUB_SHA:0:7}
+        # create new pipeline
+        echo "Uploading new pipeline"
+        plid="$(./kfplctl upload mnist-train-pipeline --pipeline mnist_train_pipeline.py.tar.gz)"
+        echo $plid
+        # use or create experiment
         eid="$(./kfplctl get experiment --name mnist-train-ci)"
         if [ -z "$eid" ]
         then
@@ -73,7 +68,7 @@ jobs:
         else
           echo $eid
         fi
-        # run
-        rid="$(./kfplctl create run mnist --parameters mnistParams.json --pipeline-id ${plid} --experiment-id ${eid})"
+        # create new run
+        rid="$(./kfplctl create run mnist-${SHA} --parameters mnistParams.json --pipeline-id ${plid} --experiment-id ${eid})"
         echo ${rid}
         ./kfplctl get run $rid status
