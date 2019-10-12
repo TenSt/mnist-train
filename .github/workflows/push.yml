@@ -60,7 +60,7 @@ jobs:
         sed -i "s,PUSH_REPO,${{ secrets.PUSH_REPO }},g" mnist_train_pipeline.py
         sed -i "s,PUSH_LOGIN,${{ secrets.PUSH_LOGIN }},g" mnist_train_pipeline.py
         sed -i "s,PUSH_PASS,${{ secrets.PUSH_PASS }},g" mnist_train_pipeline.py
-        sed -i "s,PUSH_SHA,${{ secrets.PUSH_SHA }},g" mnist_train_pipeline.py
+        sed -i "s,PUSH_SHA,${SHA},g" mnist_train_pipeline.py
         cat ./mnist_train_pipeline.py
     - name: Compile
       run: |
@@ -71,33 +71,33 @@ jobs:
         ls -lsa
         tar -xvzf mnist_train_pipeline.py.tar.gz
         cat pipeline.yaml
-    # - name: Get kfplctl
-    #   run: |
-    #     wget https://github.com/TenSt/kubeflow-pipelines-kfplctl/releases/download/v0.0.1/kfplctl
-    #     chmod +x ./kfplctl
-    # - name: kfplctl
-    #   run: |
-    #     export KUBEFLOW_PIPELINE_API=${{ secrets.KUBEFLOW_PIPELINE_API }}
-    #     SHA=${GITHUB_SHA:0:7}
-    #     # create new pipeline
-    #     echo "Uploading new pipeline"
-    #     plid="$(./kfplctl upload mnist-train-pipeline-${SHA} --pipeline mnist_train_pipeline.py.tar.gz)"
-    #     echo "Pipeline ID:"
-    #     echo $plid
-    #     # use or create experiment
-    #     echo "Check if experiment is already in place"
-    #     eid="$(./kfplctl get experiment --name mnist-train-ci)"
-    #     if [ -z "$eid" ]
-    #     then
-    #       echo "Creating new experiment"
-    #       eid="$(./kfplctl create experiment mnist-train-ci)"
-    #       echo "Experiment ID:"
-    #       echo $eid
-    #     else
-    #       echo $eid
-    #     fi
-    #     # create new run
-    #     echo "Creating new run"
-    #     rid="$(./kfplctl create run mnist-train-ci-${SHA} --parameters mnistParams.json --pipeline-id ${plid} --experiment-id ${eid})"
-    #     echo ${rid}
-    #     ./kfplctl get run $rid status
+    - name: Get kfplctl
+      run: |
+        wget https://github.com/TenSt/kubeflow-pipelines-kfplctl/releases/download/v0.0.1/kfplctl
+        chmod +x ./kfplctl
+    - name: kfplctl
+      run: |
+        export KUBEFLOW_PIPELINE_API=${{ secrets.KUBEFLOW_PIPELINE_API }}
+        SHA=${GITHUB_SHA:0:7}
+        # create new pipeline
+        echo "Uploading new pipeline"
+        plid="$(./kfplctl upload mnist-train-pipeline-${SHA} --pipeline mnist_train_pipeline.py.tar.gz)"
+        echo "Pipeline ID:"
+        echo $plid
+        # use or create experiment
+        echo "Check if experiment is already in place"
+        eid="$(./kfplctl get experiment --name mnist-train-ci)"
+        if [ -z "$eid" ]
+        then
+          echo "Creating new experiment"
+          eid="$(./kfplctl create experiment mnist-train-ci)"
+          echo "Experiment ID:"
+          echo $eid
+        else
+          echo $eid
+        fi
+        # create new run
+        echo "Creating new run"
+        rid="$(./kfplctl create run mnist-train-ci-${SHA} --parameters mnistParams.json --pipeline-id ${plid} --experiment-id ${eid})"
+        echo ${rid}
+        ./kfplctl get run $rid status

@@ -3,7 +3,7 @@
 echo "Starting"
 if [ $# -lt 4 ]
 then
-  echo "not enough arguments - need repo(without https at the start), login, pass and sha"
+  echo "not enough arguments - need repo(without https:// at the start), login, pass and sha"
   exit
 fi
 
