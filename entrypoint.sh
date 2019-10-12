@@ -11,11 +11,15 @@ git config --global user.name $2
 git config --global user.email $2
 
 echo "cloning repo"
-git clone https://$1 /opt
+cd /opt
+mkdir mnist-serve
+cd ./mnist-serve
+git clone https://$1 
 cd mnist-serve
 ls -lsa
 rm -rf ./export
 cp -r /mnt/export ./
+rm -rf /mnt/export
 echo "mnist-serve" > README.md
 ls -lsa
 git add .
