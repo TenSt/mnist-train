@@ -2,8 +2,8 @@ name: CI
 
 on: [push]
 
-jobs:
-  build:
+jobs:  
+  build-model:
 
     runs-on: ubuntu-latest
 
@@ -16,7 +16,23 @@ jobs:
         APP=${GITHUB_REPOSITORY#*/}
         DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
         docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
-        docker build . --no-cache -t ${DOCKER_URL}
+        docker build . --no-cache -f model.dockerfile -t ${DOCKER_URL}
+        docker push ${DOCKER_URL}
+  
+  build-serve:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@master
+    - name: Docker Build and Push
+      run: |
+        SHA=${GITHUB_SHA:0:7}
+        APP=${GITHUB_REPOSITORY#*/}
+        DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/push:${SHA}
+        docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+        docker build . --no-cache -f model.dockerfile -t ${DOCKER_URL}
         docker push ${DOCKER_URL}
 
   pipeline:
@@ -36,8 +52,14 @@ jobs:
       run: |
         SHA=${GITHUB_SHA:0:7}
         APP=${GITHUB_REPOSITORY#*/}
-        DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
-        sed "s,IMG,${DOCKER_URL},g" base_mnist_train_pipeline.py > ./mnist_train_pipeline.py
+        DOCKER_URL_TRAIN=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
+        DOCKER_URL_PUSH=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/push:${SHA}
+        sed -i "s,TRAIN_IMG,${DOCKER_URL_TRAIN},g" mnist_train_pipeline.py
+        sed -i "s,PUSH_IMG,${DOCKER_URL_PUSH},g" mnist_train_pipeline.py
+        sed -i "s,PUSH_REPO,${{ secrets.PUSH_REPO }},g" mnist_train_pipeline.py
+        sed -i "s,PUSH_LOGIN,${{ secrets.PUSH_LOGIN }},g" mnist_train_pipeline.py
+        sed -i "s,PUSH_PASS,${{ secrets.PUSH_PASS }},g" mnist_train_pipeline.py
+        sed -i "s,PUSH_SHA,${{ secrets.PUSH_SHA }},g" mnist_train_pipeline.py
         cat ./mnist_train_pipeline.py
     - name: Compile
       run: |
@@ -46,33 +68,35 @@ jobs:
     - name: Check
       run: |
         ls -lsa
-    - name: Get kfplctl
-      run: |
-        wget https://github.com/TenSt/kubeflow-pipelines-kfplctl/releases/download/v0.0.1/kfplctl
-        chmod +x ./kfplctl
-    - name: kfplctl
-      run: |
-        export KUBEFLOW_PIPELINE_API=${{ secrets.KUBEFLOW_PIPELINE_API }}
-        SHA=${GITHUB_SHA:0:7}
-        # create new pipeline
-        echo "Uploading new pipeline"
-        plid="$(./kfplctl upload mnist-train-pipeline-${SHA} --pipeline mnist_train_pipeline.py.tar.gz)"
-        echo "Pipeline ID:"
-        echo $plid
-        # use or create experiment
-        echo "Check if experiment is already in place"
-        eid="$(./kfplctl get experiment --name mnist-train-ci)"
-        if [ -z "$eid" ]
-        then
-          echo "Creating new experiment"
-          eid="$(./kfplctl create experiment mnist-train-ci)"
-          echo "Experiment ID:"
-          echo $eid
-        else
-          echo $eid
-        fi
-        # create new run
-        echo "Creating new run"
-        rid="$(./kfplctl create run mnist-train-ci-${SHA} --parameters mnistParams.json --pipeline-id ${plid} --experiment-id ${eid})"
-        echo ${rid}
-        ./kfplctl get run $rid status
+        tar -xvzf mnist_train_pipeline.py.tar.gz
+        cat pipeline.yaml
+    # - name: Get kfplctl
+    #   run: |
+    #     wget https://github.com/TenSt/kubeflow-pipelines-kfplctl/releases/download/v0.0.1/kfplctl
+    #     chmod +x ./kfplctl
+    # - name: kfplctl
+    #   run: |
+    #     export KUBEFLOW_PIPELINE_API=${{ secrets.KUBEFLOW_PIPELINE_API }}
+    #     SHA=${GITHUB_SHA:0:7}
+    #     # create new pipeline
+    #     echo "Uploading new pipeline"
+    #     plid="$(./kfplctl upload mnist-train-pipeline-${SHA} --pipeline mnist_train_pipeline.py.tar.gz)"
+    #     echo "Pipeline ID:"
+    #     echo $plid
+    #     # use or create experiment
+    #     echo "Check if experiment is already in place"
+    #     eid="$(./kfplctl get experiment --name mnist-train-ci)"
+    #     if [ -z "$eid" ]
+    #     then
+    #       echo "Creating new experiment"
+    #       eid="$(./kfplctl create experiment mnist-train-ci)"
+    #       echo "Experiment ID:"
+    #       echo $eid
+    #     else
+    #       echo $eid
+    #     fi
+    #     # create new run
+    #     echo "Creating new run"
+    #     rid="$(./kfplctl create run mnist-train-ci-${SHA} --parameters mnistParams.json --pipeline-id ${plid} --experiment-id ${eid})"
+    #     echo ${rid}
+    #     ./kfplctl get run $rid status

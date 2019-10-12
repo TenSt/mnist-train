@@ -41,7 +41,7 @@ def mnist_train_pipeline(model_export_dir='gs://your-bucket/export',
   """
   train = dsl.ContainerOp(
       name='train',
-      image='IMG',
+      image='TRAIN_IMG',
       arguments=[
           "/opt/model.py",
           "--tf-export-dir", model_export_dir,
@@ -51,7 +51,19 @@ def mnist_train_pipeline(model_export_dir='gs://your-bucket/export',
           ]
   )
 
-  steps = [train]
+  push = dsl.ContainerOp(
+      name='push',
+      image='PUSH_IMG',
+      arguments=[
+          "/opt/entrypoint.sh",
+          "PUSH_REPO",
+          "PUSH_LOGIN",
+          "PUSH_PASS",
+          "PUSH_SHA",
+          ]
+  )
+
+  steps = [train, push]
   for step in steps:
     if platform == 'GCP':
       step.apply(gcp.use_gcp_secret('user-gcp-sa'))
