@@ -10,8 +10,8 @@ fi
 git config --global user.name $2
 git config --global user.email $2
 
-cd /opt
-git clone https://$1
+echo "cloning repo"
+git clone https://$1 /opt
 cd mnist-serve
 ls -lsa
 rm -rf ./export
