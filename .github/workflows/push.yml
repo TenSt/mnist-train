@@ -16,10 +16,10 @@ jobs:
         APP=${GITHUB_REPOSITORY#*/}
         DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
         docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
-        docker build . --no-cache -f model.dockerfile -t ${DOCKER_URL}
+        docker build . --no-cache -f model.Dockerfile -t ${DOCKER_URL}
         docker push ${DOCKER_URL}
   
-  build-serve:
+  build-push:
 
     needs: build-model
     runs-on: ubuntu-latest
@@ -33,12 +33,12 @@ jobs:
         APP=${GITHUB_REPOSITORY#*/}
         DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/push:${SHA}
         docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
-        docker build . --no-cache -f model.dockerfile -t ${DOCKER_URL}
+        docker build . --no-cache -f push.Dockerfile -t ${DOCKER_URL}
         docker push ${DOCKER_URL}
 
   pipeline:
 
-    needs: build-serve
+    needs: build-push
     runs-on: ubuntu-latest
     
     steps:
