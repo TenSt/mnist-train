@@ -7,8 +7,8 @@ then
   exit
 fi
 
-git config --global user.name $2
-git config --global user.email $2
+git config --global user.name $3
+git config --global user.email $3
 
 echo "go to /opt"
 cd /opt
@@ -19,7 +19,7 @@ cd ./mnist-serve
 echo $1
 echo $2
 echo "cloning repo"
-git clone https://$1 
+git clone https://$2 
 cd mnist-serve
 ls -lsa
 rm -rf ./export
@@ -28,5 +28,5 @@ rm -rf /mnt/export
 echo "mnist-serve" > README.md
 ls -lsa
 git add .
-git commit -m "adding new version of the model to serve with sha $4"
-git push https://$2:$3@$1
+git commit -m "adding new version of the model to serve with sha $5"
+git push https://$3:$4@$2
