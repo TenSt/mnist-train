@@ -21,6 +21,7 @@ jobs:
   
   build-serve:
 
+    needs: build-model
     runs-on: ubuntu-latest
 
     steps:
@@ -37,7 +38,7 @@ jobs:
 
   pipeline:
 
-    needs: build
+    needs: build-serve
     runs-on: ubuntu-latest
     
     steps:
