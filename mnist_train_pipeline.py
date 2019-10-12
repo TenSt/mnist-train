@@ -62,6 +62,7 @@ def mnist_train_pipeline(model_export_dir='gs://your-bucket/export',
           "PUSH_SHA",
           ]
   )
+  push.after(train)
 
   steps = [train, push]
   for step in steps:
