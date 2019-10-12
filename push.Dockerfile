@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 
 RUN apt update
-RUN apt install git
+RUN apt install git -y
 
 ADD entrypoint.sh /opt/entrypoint.sh
 RUN chmod 777 /opt/entrypoint.sh
