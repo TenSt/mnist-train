@@ -10,10 +10,15 @@ fi
 git config --global user.name $2
 git config --global user.email $2
 
-echo "cloning repo"
+echo "go to /opt"
 cd /opt
+echo "creating new folder"
 mkdir mnist-serve
+echo "go to new folder"
 cd ./mnist-serve
+echo $1
+echo $2
+echo "cloning repo"
 git clone https://$1 
 cd mnist-serve
 ls -lsa
