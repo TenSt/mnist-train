@@ -5,7 +5,7 @@
 	},
 	{
 		"name": "train-steps",
-		"value": "500"
+		"value": "1000"
 	},
 	{
 		"name": "learning-rate",
@@ -13,7 +13,7 @@
 	},
 	{
 		"name": "batch-size",
-		"value": "100"
+		"value": "200"
 	},
 	{
 		"name": "pvc-name",
