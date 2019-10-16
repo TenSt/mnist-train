@@ -13,7 +13,7 @@ git config --global user.email $3
 cd /opt
 mkdir mnist-serve
 cd ./mnist-serve
-git clone https://$2 
+git clone https://$2
 cd mnist-serve
 ls -lsa
 rm -rf ./export
