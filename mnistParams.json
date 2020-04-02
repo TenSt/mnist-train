@@ -17,6 +17,6 @@
 	},
 	{
 		"name": "pvc-name",
-		"value": "local-storage"
+		"value": "demo-storage"
 	}
 ]
