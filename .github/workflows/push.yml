@@ -14,8 +14,10 @@ jobs:
       run: |
         SHA=${GITHUB_SHA:0:7}
         APP=${GITHUB_REPOSITORY#*/}
-        DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
-        docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+        # DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
+        # docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+        DOCKER_URL=${{ secrets.DOCKER_REGISTRY_USERNAME }}/${APP}:${SHA}
+        docker login -u ${{ secrets.DOCKER_REGISTRY_USERNAME }} -p ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
         docker build . --no-cache -f model.Dockerfile -t ${DOCKER_URL}
         docker push ${DOCKER_URL}
   
@@ -30,9 +32,11 @@ jobs:
       run: |
         SHA=${GITHUB_SHA:0:7}
         APP=${GITHUB_REPOSITORY#*/}
-        DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/push:${SHA}
-        docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
-        docker build . --no-cache -f push.Dockerfile -t ${DOCKER_URL}
+        # DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/push:${SHA}
+        # docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+        DOCKER_URL=${{ secrets.DOCKER_REGISTRY_USERNAME }}/mnist-push:${SHA}
+        docker login -u ${{ secrets.DOCKER_REGISTRY_USERNAME }} -p ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+        docker build . --no-cache -f model.Dockerfile -t ${DOCKER_URL}
         docker push ${DOCKER_URL}
 
   pipeline:
@@ -51,8 +55,10 @@ jobs:
       run: |
         SHA=${GITHUB_SHA:0:7}
         APP=${GITHUB_REPOSITORY#*/}
-        DOCKER_URL_TRAIN=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
-        DOCKER_URL_PUSH=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/push:${SHA}
+        # DOCKER_URL_TRAIN=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/${APP}:${SHA}
+        # DOCKER_URL_PUSH=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USERNAME }}/${APP}/push:${SHA}
+        DOCKER_URL_TRAIN=${{ secrets.DOCKER_REGISTRY_USERNAME }}/${APP}:${SHA}
+        DOCKER_URL_PUSH=${{ secrets.DOCKER_REGISTRY_USERNAME }}/mnist-push:${SHA}
         sed -i "s,TRAIN_IMG,${DOCKER_URL_TRAIN},g" mnist_train_pipeline.py
         sed -i "s,PUSH_IMG,${DOCKER_URL_PUSH},g" mnist_train_pipeline.py
         sed -i "s,PUSH_REPO,${{ secrets.PUSH_REPO }},g" mnist_train_pipeline.py
