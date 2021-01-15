@@ -5,7 +5,7 @@
 	},
 	{
 		"name": "train-steps",
-		"value": "100"
+		"value": "200"
 	},
 	{
 		"name": "learning-rate",
